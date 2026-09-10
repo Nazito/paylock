@@ -33,15 +33,20 @@
   <section class="panel">
     <h2>1. Contract on this network</h2>
     <p class="hint">
-      Monad Testnet contract is prefilled. Connect the wallet, confirm the network is Monad Testnet
-      (in MetaMask that list is at the bottom of the sidebar, not the Account name), then lock an invoice.
-      Deploy only if you want a new contract of your own. Test MON, not real money.
+      @if (pay.chainId() === chains.arbitrumSepolia.id) {
+        Arbitrum Sepolia is the Open House testnet. Get test ETH from the faucet, then Deploy.
+        Test ETH, not real money.
+        <a href="https://faucet.quicknode.com/arbitrum/sepolia" target="_blank" rel="noreferrer">Faucet</a>
+      } @else {
+        Monad Testnet contract is prefilled. Confirm the network in MetaMask (list at the bottom of the sidebar),
+        then lock an invoice. Deploy only if you want a new contract of your own. Test MON, not real money.
+      }
     </p>
     <div class="row">
       <input [(ngModel)]="contractInput" placeholder="0x…" spellcheck="false" />
       <button type="button" (click)="saveContract()">Save</button>
       <button type="button" class="primary" (click)="deploy()" [disabled]="pay.busy()">
-        Deploy on Monad
+        {{ deployLabel() }}
       </button>
     </div>
     @if (pay.contract()) {

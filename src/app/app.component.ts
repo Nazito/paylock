@@ -32,6 +32,10 @@ export class AppComponent implements OnInit {
     return ["monadTestnet", "arbitrumSepolia"];
   }
 
+  deployLabel(): string {
+    return this.pay.chainId() === CHAINS.arbitrumSepolia.id ? "Deploy on Arbitrum" : "Deploy on Monad";
+  }
+
   async connect(): Promise<void> {
     try {
       await this.pay.connect();

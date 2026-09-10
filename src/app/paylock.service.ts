@@ -383,7 +383,11 @@ export class PaylockService {
 
   async deploy(): Promise<string> {
     if (!this.account()) throw new Error("Connect a wallet first.");
-    await this.switchChain("monadTestnet");
+    const key = this.chainKey();
+    if (key !== "monadTestnet" && key !== "arbitrumSepolia") {
+      throw new Error("Click Monad Testnet or Arbitrum Sepolia first.");
+    }
+    await this.switchChain(key);
     const { PAYLOCK_BYTECODE } = await import("./paylock.bytecode");
     return this.withBusy(async () => {
       const hash = await this.send({ data: PAYLOCK_BYTECODE });

@@ -53,6 +53,17 @@ forge test
 | Faucet | https://faucet.monad.xyz |
 | Contract | `0x132f284c85421EEF684a0B4A6639Cc541d9ED9aB` |
 
+## Arbitrum Sepolia (Open House)
+
+Same app. Click **Arbitrum Sepolia** in the UI, get test ETH from https://faucet.quicknode.com/arbitrum/sepolia, then **Deploy on Arbitrum**. Buildathon window **14 Sep – 4 Oct 2026**. Do not use the in-person Founder House form unless you actually go to Singapore.
+
+| | |
+|---|---|
+| Chain ID | `421614` |
+| RPC | `https://sepolia-rollup.arbitrum.io/rpc` |
+| Explorer | https://sepolia.arbiscan.io |
+| Faucet | https://faucet.quicknode.com/arbitrum/sepolia |
+
 ## Tests
 
 `forge test` covers: match → released, wrong payee → funds stay, wrong amount → funds stay, replay → already_settled, stranger cannot release, refund.
