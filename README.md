@@ -2,7 +2,7 @@
 
 Invoice escrow: native tokens sit in a contract until the payer confirms the **exact payee and amount**. A wrong address does not get paid. A settled invoice cannot pay twice.
 
-Live demo: *(URL after Vercel)*  
+Live demo: https://paylock.vercel.app  
 Contract (Monad Testnet): [`0x132f284c85421EEF684a0B4A6639Cc541d9ED9aB`](https://testnet.monadvision.com/address/0x132f284c85421EEF684a0B4A6639Cc541d9ED9aB)
 
 Built for [Monad Metropolis](https://hackathon.monad.xyz) (Consumer Products & Payments) and [Arbitrum Open House](https://hackquest.io/en/hackathons/Arbitrum-Open-House-Singapore-Online-Buildathon). Same Angular app + same Solidity contract; switch the network in the UI.

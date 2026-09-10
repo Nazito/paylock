@@ -60,8 +60,6 @@ export class PaylockService {
         const list = accounts as string[];
         this.account.set(list[0] ? getAddress(list[0]) : "");
       });
-    } else if (this.addresses["31337"]) {
-      this.contract.set(this.addresses["31337"]);
     }
   }
 
@@ -97,7 +95,8 @@ export class PaylockService {
     const id = String(this.chainId() || 0);
     const stored = localStorage.getItem(`paylock.contract.${id}`);
     const fromFile = this.addresses[id] || "";
-    const addr = stored || fromFile;
+    const fallback = this.addresses["10143"] || "";
+    const addr = stored || fromFile || fallback;
     this.contract.set(addr && isAddress(addr) ? getAddress(addr) : "");
   }
 
