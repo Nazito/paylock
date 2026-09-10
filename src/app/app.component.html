@@ -1,0 +1,118 @@
+<div class="page">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Accounts payable</p>
+      <h1>Paylock</h1>
+      <p class="lede">
+        The invoice names one recipient. Anyone else gets nothing.
+        Funds sit in a lock until you confirm the exact payee and amount.
+      </p>
+    </div>
+    <div class="wallet">
+      @if (!pay.hasWallet()) {
+        <p class="warn">Need a browser wallet to continue.</p>
+      }
+      <button type="button" class="primary" (click)="connect()" [disabled]="pay.busy()">
+        {{ pay.account() ? short(pay.account()) : "Connect wallet" }}
+      </button>
+      <div class="nets">
+        @for (key of chainKeys(); track key) {
+          <button
+            type="button"
+            class="chip"
+            [class.on]="pay.chainId() === chains[key].id"
+            (click)="useChain(key)"
+          >
+            {{ chains[key].name }}
+          </button>
+        }
+      </div>
+    </div>
+  </header>
+
+  <section class="panel">
+    <h2>1. Contract on this network</h2>
+    <p class="hint">
+      Monad Testnet contract is prefilled. Connect the wallet, confirm the network is Monad Testnet
+      (in MetaMask that list is at the bottom of the sidebar, not the Account name), then lock an invoice.
+      Deploy only if you want a new contract of your own. Test MON, not real money.
+    </p>
+    <div class="row">
+      <input [(ngModel)]="contractInput" placeholder="0x…" spellcheck="false" />
+      <button type="button" (click)="saveContract()">Save</button>
+      <button type="button" class="primary" (click)="deploy()" [disabled]="pay.busy()">
+        Deploy on Monad
+      </button>
+    </div>
+    @if (pay.contract()) {
+      <p class="mono">Using {{ pay.contract() }}</p>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>2. Lock an invoice</h2>
+    <div class="fields">
+      <label>
+        Payee
+        <input [(ngModel)]="payee" placeholder="0x recipient" spellcheck="false" />
+      </label>
+      <label>
+        Amount ({{ pay.chainMeta()?.symbol || "ETH" }})
+        <input [(ngModel)]="amount" />
+      </label>
+      <label>
+        Memo
+        <input [(ngModel)]="memo" />
+      </label>
+    </div>
+    <button type="button" class="primary cta" (click)="lockPayment()" [disabled]="pay.busy()">
+      Lock payment
+    </button>
+  </section>
+
+  <section class="panel">
+    <h2>3. Try to settle</h2>
+    <p class="hint">Same three outcomes every time: held on a wrong payee, released on a match, already_settled on a replay.</p>
+    <div class="actions">
+      <button type="button" class="danger" (click)="tryAttacker()" [disabled]="pay.busy()">
+        Pay a different address
+      </button>
+      <button type="button" class="primary" (click)="payInvoice()" [disabled]="pay.busy()">
+        Pay the invoice payee
+      </button>
+      <button type="button" (click)="payAgain()" [disabled]="pay.busy()">Pay again</button>
+    </div>
+  </section>
+
+  @if (lastMessage) {
+    <p class="banner" [class.ok]="lastKind === 'ok'" [class.held]="lastKind === 'held'" [class.err]="lastKind === 'err'">
+      {{ lastMessage }}
+    </p>
+  }
+
+  @if (pay.invoices().length) {
+    <section class="panel">
+      <h2>Invoices</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Payee</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of pay.invoices(); track inv.id) {
+            <tr>
+              <td>{{ inv.id }}</td>
+              <td class="mono">{{ short(inv.payee) }}</td>
+              <td>{{ inv.amountLabel }}</td>
+              <td>{{ inv.status }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  }
+</div>
