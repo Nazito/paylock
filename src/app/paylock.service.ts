@@ -95,8 +95,9 @@ export class PaylockService {
     const id = String(this.chainId() || 0);
     const stored = localStorage.getItem(`paylock.contract.${id}`);
     const fromFile = this.addresses[id] || "";
-    const fallback = this.addresses["10143"] || "";
-    const addr = stored || fromFile || fallback;
+    // Do not fall back to Monad (10143) on other chains — that made Arbitrum
+    // look unchanged (same 0x132f… address) when the chip was clicked.
+    const addr = stored || fromFile || "";
     this.contract.set(addr && isAddress(addr) ? getAddress(addr) : "");
   }
 

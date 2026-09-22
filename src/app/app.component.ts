@@ -26,6 +26,9 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.pay.init();
     this.contractInput = this.pay.contract();
+    window.ethereum?.on?.("chainChanged", () => {
+      this.contractInput = this.pay.contract();
+    });
   }
 
   chainKeys(): ChainKey[] {
@@ -60,6 +63,12 @@ export class AppComponent implements OnInit {
     try {
       await this.pay.switchChain(key);
       this.contractInput = this.pay.contract();
+      const name = CHAINS[key].name;
+      if (this.pay.contract()) {
+        this.note("ok", `On ${name}. Using saved contract.`);
+      } else {
+        this.note("ok", `On ${name}. No contract yet — click Deploy.`);
+      }
     } catch (e) {
       this.fail(e);
     }

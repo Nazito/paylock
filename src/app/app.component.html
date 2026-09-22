@@ -34,12 +34,14 @@
     <h2>1. Contract on this network</h2>
     <p class="hint">
       @if (pay.chainId() === chains.arbitrumSepolia.id) {
-        Arbitrum Sepolia is the Open House testnet. Get test ETH from the faucet, then Deploy.
+        Arbitrum Sepolia is selected. Field below should be empty until you Deploy (do not reuse the Monad address).
         Test ETH, not real money.
         <a href="https://faucet.quicknode.com/arbitrum/sepolia" target="_blank" rel="noreferrer">Faucet</a>
-      } @else {
+      } @else if (pay.chainId() === chains.monadTestnet.id) {
         Monad Testnet contract is prefilled. Confirm the network in MetaMask (list at the bottom of the sidebar),
         then lock an invoice. Deploy only if you want a new contract of your own. Test MON, not real money.
+      } @else {
+        Click <strong>Arbitrum Sepolia</strong> or <strong>Monad Testnet</strong> above to match MetaMask.
       }
     </p>
     <div class="row">
