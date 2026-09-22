@@ -17,6 +17,15 @@ export const CHAINS = {
     explorer: "https://sepolia.arbiscan.io",
     faucet: "https://faucet.quicknode.com/arbitrum/sepolia",
   },
+  xLayerTestnet: {
+    id: 1952,
+    hexId: "0x7a0",
+    name: "X Layer Testnet",
+    symbol: "OKB",
+    rpc: "https://testrpc.xlayer.tech/terigon",
+    explorer: "https://www.okx.com/web3/explorer/xlayer-test",
+    faucet: "https://web3.okx.com/xlayer/faucet",
+  },
   anvil: {
     id: 31337,
     hexId: "0x7a69",
@@ -116,6 +125,13 @@ export const PAYLOCK_ABI = [
         ],
       },
     ],
+  },
+  {
+    type: "function",
+    name: "nextId",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
   },
 ] as const;
 

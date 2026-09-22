@@ -114,10 +114,41 @@ export class PaylockService {
     const cid = (await window.ethereum.request({ method: "eth_chainId" })) as string;
     this.chainId.set(Number.parseInt(cid, 16));
     this.refreshContract();
+    await this.reloadInvoices();
+  }
+
+  /** Re-read invoices from the current contract (survives page reload). */
+  async reloadInvoices(): Promise<void> {
+    if (!window.ethereum || !this.contract() || !isAddress(this.contract())) {
+      this.invoices.set([]);
+      return;
+    }
+    try {
+      const nextData = encodeFunctionData({ abi: PAYLOCK_ABI, functionName: "nextId" });
+      const nextRaw = (await window.ethereum.request({
+        method: "eth_call",
+        params: [{ to: this.contract(), data: nextData }, "latest"],
+      })) as Hex;
+      const next = Number(hexToBigInt(nextRaw));
+      const loaded: InvoiceView[] = [];
+      for (let id = next - 1; id >= 1 && loaded.length < 8; id--) {
+        try {
+          loaded.push(await this.refreshInvoice(String(id)));
+        } catch {
+          /* skip gaps */
+        }
+      }
+      // refreshInvoice already updates signal; keep newest-first unique
+      const byId = new Map(loaded.map((x) => [x.id, x]));
+      this.invoices.set([...byId.values()].sort((a, b) => Number(b.id) - Number(a.id)));
+    } catch {
+      /* leave list as-is */
+    }
   }
 
   async switchChain(key: ChainKey): Promise<void> {
     if (!window.ethereum) return;
+    this.invoices.set([]);
     const chain = CHAINS[key];
     try {
       await window.ethereum.request({
@@ -146,6 +177,7 @@ export class PaylockService {
     const cid = (await window.ethereum.request({ method: "eth_chainId" })) as string;
     this.chainId.set(Number.parseInt(cid, 16));
     this.refreshContract();
+    await this.reloadInvoices();
   }
 
   async lock(payee: string, amount: string, memo: string): Promise<string> {
@@ -385,8 +417,8 @@ export class PaylockService {
   async deploy(): Promise<string> {
     if (!this.account()) throw new Error("Connect a wallet first.");
     const key = this.chainKey();
-    if (key !== "monadTestnet" && key !== "arbitrumSepolia") {
-      throw new Error("Click Monad Testnet or Arbitrum Sepolia first.");
+    if (key !== "monadTestnet" && key !== "arbitrumSepolia" && key !== "xLayerTestnet") {
+      throw new Error("Click Monad Testnet, Arbitrum Sepolia, or X Layer Testnet first.");
     }
     await this.switchChain(key);
     const { PAYLOCK_BYTECODE } = await import("./paylock.bytecode");

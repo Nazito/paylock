@@ -37,11 +37,14 @@
         Arbitrum Sepolia is selected. Field below should be empty until you Deploy (do not reuse the Monad address).
         Test ETH, not real money.
         <a href="https://faucet.quicknode.com/arbitrum/sepolia" target="_blank" rel="noreferrer">Faucet</a>
+      } @else if (pay.chainId() === chains.xLayerTestnet.id) {
+        X Layer Testnet is selected (OKX Dev Day). Field empty until Deploy. Test OKB, not real money.
+        <a href="https://web3.okx.com/xlayer/faucet" target="_blank" rel="noreferrer">Faucet</a>
       } @else if (pay.chainId() === chains.monadTestnet.id) {
         Monad Testnet contract is prefilled. Confirm the network in MetaMask (list at the bottom of the sidebar),
         then lock an invoice. Deploy only if you want a new contract of your own. Test MON, not real money.
       } @else {
-        Click <strong>Arbitrum Sepolia</strong> or <strong>Monad Testnet</strong> above to match MetaMask.
+        Click <strong>X Layer Testnet</strong>, <strong>Arbitrum Sepolia</strong>, or <strong>Monad Testnet</strong> above.
       }
     </p>
     <div class="row">

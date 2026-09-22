@@ -26,24 +26,31 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.pay.init();
     this.contractInput = this.pay.contract();
+    if (this.pay.account()) this.payee = this.pay.account();
+    await this.pay.reloadInvoices();
     window.ethereum?.on?.("chainChanged", () => {
       this.contractInput = this.pay.contract();
+      void this.pay.reloadInvoices();
     });
   }
 
   chainKeys(): ChainKey[] {
-    return ["monadTestnet", "arbitrumSepolia"];
+    return ["monadTestnet", "arbitrumSepolia", "xLayerTestnet"];
   }
 
   deployLabel(): string {
-    return this.pay.chainId() === CHAINS.arbitrumSepolia.id ? "Deploy on Arbitrum" : "Deploy on Monad";
+    const id = this.pay.chainId();
+    if (id === CHAINS.arbitrumSepolia.id) return "Deploy on Arbitrum";
+    if (id === CHAINS.xLayerTestnet.id) return "Deploy on X Layer";
+    return "Deploy on Monad";
   }
 
   async connect(): Promise<void> {
     try {
       await this.pay.connect();
       this.contractInput = this.pay.contract();
-      if (!this.payee && this.pay.account()) this.payee = this.pay.account();
+      if (this.pay.account()) this.payee = this.pay.account();
+      await this.pay.reloadInvoices();
     } catch (e) {
       this.fail(e);
     }
@@ -63,6 +70,7 @@ export class AppComponent implements OnInit {
     try {
       await this.pay.switchChain(key);
       this.contractInput = this.pay.contract();
+      if (this.pay.account()) this.payee = this.pay.account();
       const name = CHAINS[key].name;
       if (this.pay.contract()) {
         this.note("ok", `On ${name}. Using saved contract.`);
@@ -107,14 +115,18 @@ export class AppComponent implements OnInit {
   }
 
   async payInvoice(): Promise<void> {
-    const inv = this.pay.invoices()[0];
+    if (!this.pay.invoices().length) {
+      await this.pay.reloadInvoices();
+    }
+    const inv = this.pay.invoices().find((x) => x.status === "funded") ?? this.pay.invoices()[0];
     if (!inv) {
       this.note("err", "Lock an invoice first.");
       return;
     }
     try {
-      await this.pay.release(inv.id, inv.payee, inv.amountLabel);
-      this.note("ok", `Invoice ${inv.id} released to the listed payee.`);
+      const fresh = await this.pay.refreshInvoice(inv.id);
+      await this.pay.release(fresh.id, fresh.payee, fresh.amountLabel);
+      this.note("ok", `Invoice ${fresh.id} released to the listed payee.`);
     } catch (e) {
       this.fail(e);
     }
